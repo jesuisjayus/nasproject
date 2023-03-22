@@ -71,10 +71,57 @@ def adressageLoopback(num_routeur_as, num_as):
 
 
 
+#ecrire bgp
+def configBGP(num_routeur, num_as, typeRouteur):
+
+    if(typeRouteur=="bordure"):
+   
+        AS = str(obj_python["AS"][num_as]["numeroAS"])
+       
+        res =   ("router bgp "+AS+"\n"
+                   + " bgp router-id "+str(num_routeur)+"."+str(num_routeur)+"."+str(num_routeur)+"."+str(num_routeur)+"\n"
+                   + " bgp log-neighbor-changes\n" )
+
+
+        for i in range(len(obj_python["AS"][num_as]["routeurs"])):
+            adresse = obj_python["AS"][num_as]["routeurs"][i]["id"][1:]
+
+# FAIRE CONDITIONS POUR NE METTRE QUE LES ROUTEURS BORDURE
+
+
+            if adresse != str(num_routeur):
+                res= res + " neighbor 10.0.0."+adresse+" remote-as "+AS+"\n"+ " neighbor 10.0.0."+adresse+" update-source Loopback0\n"
+
+        res = (res  + " !\n"
+                    + " address-family vpnv4\n" )
+     
+
+        for i in range(len(obj_python["AS"][num_as]["routeurs"])):
+            adresse = obj_python["AS"][num_as]["routeurs"][i]["id"][1:]
+
+            if adresse != str(num_routeur):
+                res = res + "  neighbor 10.0.0."+adresse+" activate\n"
+                for n in range(len(obj_python["connexion"]["connections"])):
+                    if num_routeur == int(obj_python["connexion"]["connections"][n]["id1"][1:]) or num_routeur == int(obj_python["connexion"]["connections"][n]["id2"][1:]):
+                        res = res + "  neighbor 10.0.0."+adresse+" send-community both\n"
+
+
+        res = res + " exit-address-family\n"
+
+        return res
+
+    return ""           
+
+
+
+
+
+
 def ecrireConfig(num_routeur, file, num_as, num_routeur_as): 
 
     protocole = obj_python["AS"][num_as]["routage_protocol"]
     nomRouteur = obj_python["AS"][num_as]["routeurs"][num_routeur_as]["id"]
+    typeRouteur = obj_python["AS"][num_as]["routeurs"][num_routeur_as]["type"]
 
     file.write("!\nversion 15.2\nservice timestamps debug datetime msec\nservice timestamps log datetime msec  \n! \nhostname "
                + nomRouteur + "\n"
@@ -109,8 +156,8 @@ def ecrireConfig(num_routeur, file, num_as, num_routeur_as):
                 + adressage(num_routeur,"GigabitEthernet4/0", num_as, nomRouteur)
                + "\n!\n"
 
-            #    # bgp
-            #    + configBGP(num_routeur, num_as)
+               # bgp
+               + configBGP(num_routeur, num_as, typeRouteur)
                + ecrireProtocole(protocole, nomRouteur)
                + "!\n"
                + "ip forward-protocol nd\n"
