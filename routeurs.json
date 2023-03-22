@@ -1,0 +1,132 @@
+{
+	"AS":
+		[{ "numeroAS": 1,
+			
+				"prefix": "2001:100:4:",
+
+				"routeurs": [
+							{"id":"R1", "address":"2001:ABCD:1::1"},
+							{"id":"R2", "address":"2001:ABCD:2::1"},
+							{"id":"R3", "address":"2001:ABCD:3::1"},
+							{"id":"R4", "address":"2001:ABCD:4::1"},
+							{"id":"R5", "address":"2001:ABCD:5::1"},
+							{"id":"R6", "address":"2001:ABCD:6::1"},
+							{"id":"R7", "address":"2001:ABCD:7::1"}
+							],
+
+
+					"connections":[  {"id1":"R1", "id2":"R2", "interface1":"FastEthernet0/0",      "interface2": "FastEthernet0/0"	         },
+									{"id1":"R1", "id2":"R3", "interface1":"GigabitEthernet1/0",   "interface2": "GigabitEthernet1/0"        },
+									{"id1":"R1", "id2":"R4", "interface1":"GigabitEthernet2/0",   "interface2": "GigabitEthernet2/0"        },
+									{"id1":"R2", "id2":"R3", "interface1":"GigabitEthernet2/0",   "interface2": "GigabitEthernet2/0"        },
+									{"id1":"R2", "id2":"R5", "interface1":"GigabitEthernet1/0",   "interface2": "GigabitEthernet1/0"        },
+									{"id1":"R4", "id2":"R5", "interface1":"GigabitEthernet3/0",   "interface2": "GigabitEthernet3/0"        },
+									{"id1":"R4", "id2":"R6", "interface1":"GigabitEthernet1/0",   "interface2": "GigabitEthernet1/0"        },
+									{"id1":"R4", "id2":"R7", "interface1":"FastEthernet0/0",	   "interface2": "FastEthernet0/0"	         },
+									{"id1":"R5", "id2":"R6", "interface1":"FastEthernet0/0",  	   "interface2":  "FastEthernet0/0"	         },
+									{"id1":"R5", "id2":"R7", "interface1":"GigabitEthernet2/0",   "interface2":  "GigabitEthernet2/0"       }
+				
+					],
+
+			"routage_protocol": "RIP"
+
+				
+			
+		},
+
+		{
+			"numeroAS": 2,
+			
+				"prefix": "2001:100:5:",
+
+				"routeurs":[{ "id":  "R8", "address": "2001:ABCD:8::1"},
+							{ "id":  "R9", "address": "2001:ABCD:9::1"}, 			 		
+							{ "id": "R10", "address": "2001:ABCD:10::1"},
+							{ "id": "R11", "address": "2001:ABCD:11::1"},
+							{ "id": "R12", "address": "2001:ABCD:12::1"},
+							{ "id": "R13", "address": "2001:ABCD:13::1"},
+							{ "id": "R14", "address": "2001:ABCD:14::1"}
+
+					],
+
+				"connections":[{"id1":"R8", "id2": "R10","interface1": "FastEthernet0/0",		"cout1": "default", "interface2": 	"FastEthernet0/0"		, "cout2": "500"},
+							{"id1":"R8", "id2": "R11", "interface1": "GigabitEthernet1/0" ,	"cout1": "default", "interface2": 	"GigabitEthernet1/0"	, "cout2": "default"}, 
+							{"id1":"R9", "id2": "R10","interface1":  "GigabitEthernet1/0",	"cout1": "default", "interface2": 	"GigabitEthernet1/0"	, "cout2": "default"},
+							{"id1":"R9", "id2": "R11","interface1":  "FastEthernet0/0", 		"cout1": "default", "interface2": 	"FastEthernet0/0"		, "cout2": "default"},
+							{"id1":"R10","id2": "R11","interface1": "GigabitEthernet2/0",	"cout1": "default", "interface2": 	"GigabitEthernet2/0"	, "cout2": "default"}, 
+							{"id1":"R12","id2": "R10","interface1": "GigabitEthernet3/0", 	"cout1": "default", "interface2": 	"GigabitEthernet3/0"		, "cout2": "default"},
+							{"id1":"R13","id2": "R11","interface1": "GigabitEthernet3/0", 	"cout1": "default", "interface2": 	"GigabitEthernet3/0"		, "cout2": "default"},
+							{"id1":"R12","id2": "R13","interface1": "FastEthernet0/0",		"cout1": "default", "interface2": 	"FastEthernet0/0"			, "cout2": "default"},
+							{"id1":"R12","id2": "R14","interface1": "GigabitEthernet1/0", 	"cout1": "default", "interface2": 	"GigabitEthernet1/0"		, "cout2": "default"},
+							{"id1":"R13","id2": "R14","interface1": "GigabitEthernet2/0",	"cout1": "default", "interface2": 	"GigabitEthernet2/0"		, "cout2": "default"}
+				
+					],
+
+			"routage_protocol": "OSPF"
+
+			},
+
+			{ "numeroAS": 3,
+			
+				"prefix": "2001:100:7:",
+
+				"routeurs": [
+							{"id":"R15", "address":"2001:ABCD:15::1"},
+							{"id":"R16", "address":"2001:ABCD:16::1"}
+							],
+
+
+					"connections":[  {"id1":"R15", "id2":"R16", "interface1":"FastEthernet0/0",      "interface2": "FastEthernet0/0"	         }
+				
+					],
+
+			"routage_protocol": "RIP"
+
+				
+			
+			},
+		
+			{ "numeroAS": 4,
+			
+				"prefix": "2001:100:8:",
+
+				"routeurs": [
+							{"id":"R17", "address":"2001:ABCD:17::1"},
+							{"id":"R18", "address":"2001:ABCD:18::1"}
+							],
+
+
+					"connections":[  {"id1":"R17", "id2":"R18", "interface1":"FastEthernet0/0",      "interface2": "FastEthernet0/0"	         }
+				
+					],
+
+			"routage_protocol": "RIP"
+
+				
+			
+			}],
+
+		
+	"connexion":
+	  {
+		"routeurs":[{"id":"R6", "as": 1, "filter_state": "default"},
+		 	     	{"id":"R7", "as": 1, "filter_state": "default"},
+		 	 	   	{"id":"R8", "as": 2,  "filtre": "default" },
+					{"id":"R9", "as": 2,  "filtre": "default" },
+		 	  		{"id":"R12", "as": 2, "filter_state": "default"},
+					{"id":"R13", "as": 2, "filter_state": "default"},
+					{"id":"R15", "as": 3, "filter_state": "default"},
+					{"id":"R17", "as": 4, "filter_state": "default"}
+			   ],
+
+		"connections":[{"id1":"R8", "id2": "R6" , "address": "2001:100:6:2::", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet2/0", "relation1":"peer","relation2":"peer"},
+			     	   {"id1":"R7", "id2": "R9" , "address": "2001:100:6:1::", "interface1": "GigabitEthernet3/0", "interface2": "GigabitEthernet3/0", "relation1":"peer","relation2":"peer"},
+					   {"id1":"R12", "id2": "R15" , "address": "2001:100:6:3::", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet3/0", "relation1":"peer","relation2":"provider"},
+					   {"id1":"R13", "id2": "R17" , "address": "2001:100:6:4::", "interface1": "GigabitEthernet1/0", "interface2": "GigabitEthernet3/0", "relation1":"peer","relation2":"client"}
+			     	 ]
+	
+
+	  }
+	
+	
+}
