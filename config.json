@@ -1,0 +1,48 @@
+{
+	"AS":
+		[{ "numeroAS": 1,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							{"id":"R1", "address":"10.0.0.1"},
+							{"id":"R2", "address":"10.0.0.2"},
+							{"id":"R3", "address":"10.0.0.3"},
+							{"id":"R4", "address":"10.0.0.4"}
+							],
+
+
+				"connections":[  {"id1":"R1", "id2":"R2", "interface1":"GigabitEthernet1/0",  "interface2": "GigabitEthernet1/0"  },
+								{"id1":"R2", "id2":"R3", "interface1":"GigabitEthernet2/0",   "interface2": "GigabitEthernet2/0"  },
+								{"id1":"R3", "id2":"R4", "interface1":"GigabitEthernet1/0",   "interface2": "GigabitEthernet1/0"  }							
+			
+				],
+
+			"routage_protocol": "OSPF"
+			
+		}],
+
+		
+	"connexion":
+	  {
+		"routeurs":[{"id":"R6", "as": 1, "filter_state": "default"},
+		 	     	{"id":"R7", "as": 1, "filter_state": "default"},
+		 	 	   	{"id":"R8", "as": 2,  "filtre": "default" },
+					{"id":"R9", "as": 2,  "filtre": "default" },
+		 	  		{"id":"R12", "as": 2, "filter_state": "default"},
+					{"id":"R13", "as": 2, "filter_state": "default"},
+					{"id":"R15", "as": 3, "filter_state": "default"},
+					{"id":"R17", "as": 4, "filter_state": "default"}
+			   ],
+
+		"connections":[{"id1":"R8", "id2": "R6" , "address": "2001:100:6:2::", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet2/0", "relation1":"peer","relation2":"peer"},
+			     	   {"id1":"R7", "id2": "R9" , "address": "2001:100:6:1::", "interface1": "GigabitEthernet3/0", "interface2": "GigabitEthernet3/0", "relation1":"peer","relation2":"peer"},
+					   {"id1":"R12", "id2": "R15" , "address": "2001:100:6:3::", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet3/0", "relation1":"peer","relation2":"provider"},
+					   {"id1":"R13", "id2": "R17" , "address": "2001:100:6:4::", "interface1": "GigabitEthernet1/0", "interface2": "GigabitEthernet3/0", "relation1":"peer","relation2":"client"}
+			     	 ]
+	
+
+	  }
+	
+	
+}

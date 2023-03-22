@@ -28,7 +28,7 @@
 				
 					],
 
-			"routage_protocol": "RIP"
+			"routage_protocol": "OSPF"
 
 				
 			
@@ -49,16 +49,16 @@
 
 					],
 
-				"connections":[{"id1":"R8", "id2": "R10","interface1": "FastEthernet0/0",		"cout1": "default", "interface2": 	"FastEthernet0/0"		, "cout2": "500"},
+				"connections":[{"id1":"R8", "id2": "R10","interface1": "FastEthernet0/0",	"cout1": "default", "interface2": 	"FastEthernet0/0"		, "cout2": "500"},
 							{"id1":"R8", "id2": "R11", "interface1": "GigabitEthernet1/0" ,	"cout1": "default", "interface2": 	"GigabitEthernet1/0"	, "cout2": "default"}, 
 							{"id1":"R9", "id2": "R10","interface1":  "GigabitEthernet1/0",	"cout1": "default", "interface2": 	"GigabitEthernet1/0"	, "cout2": "default"},
-							{"id1":"R9", "id2": "R11","interface1":  "FastEthernet0/0", 		"cout1": "default", "interface2": 	"FastEthernet0/0"		, "cout2": "default"},
+							{"id1":"R9", "id2": "R11","interface1":  "FastEthernet0/0", 	"cout1": "default", "interface2": 	"FastEthernet0/0"		, "cout2": "default"},
 							{"id1":"R10","id2": "R11","interface1": "GigabitEthernet2/0",	"cout1": "default", "interface2": 	"GigabitEthernet2/0"	, "cout2": "default"}, 
-							{"id1":"R12","id2": "R10","interface1": "GigabitEthernet3/0", 	"cout1": "default", "interface2": 	"GigabitEthernet3/0"		, "cout2": "default"},
-							{"id1":"R13","id2": "R11","interface1": "GigabitEthernet3/0", 	"cout1": "default", "interface2": 	"GigabitEthernet3/0"		, "cout2": "default"},
-							{"id1":"R12","id2": "R13","interface1": "FastEthernet0/0",		"cout1": "default", "interface2": 	"FastEthernet0/0"			, "cout2": "default"},
-							{"id1":"R12","id2": "R14","interface1": "GigabitEthernet1/0", 	"cout1": "default", "interface2": 	"GigabitEthernet1/0"		, "cout2": "default"},
-							{"id1":"R13","id2": "R14","interface1": "GigabitEthernet2/0",	"cout1": "default", "interface2": 	"GigabitEthernet2/0"		, "cout2": "default"}
+							{"id1":"R12","id2": "R10","interface1": "GigabitEthernet3/0", 	"cout1": "default", "interface2": 	"GigabitEthernet3/0"	, "cout2": "default"},
+							{"id1":"R13","id2": "R11","interface1": "GigabitEthernet3/0", 	"cout1": "default", "interface2": 	"GigabitEthernet3/0"	, "cout2": "default"},
+							{"id1":"R12","id2": "R13","interface1": "FastEthernet0/0",		"cout1": "default", "interface2": 	"FastEthernet0/0"		, "cout2": "default"},
+							{"id1":"R12","id2": "R14","interface1": "GigabitEthernet1/0", 	"cout1": "default", "interface2": 	"GigabitEthernet1/0"	, "cout2": "default"},
+							{"id1":"R13","id2": "R14","interface1": "GigabitEthernet2/0",	"cout1": "default", "interface2": 	"GigabitEthernet2/0"	, "cout2": "default"}
 				
 					],
 
