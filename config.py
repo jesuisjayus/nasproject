@@ -15,6 +15,8 @@ def ecrireProtocole(protocole, nomRouteur):
         routeurID = n+"."+n+"."+n+"."+n
         return "router ospf 123\n router-id "+routeurID+"\n"
 
+    return ""
+
 
 def adressage(num_routeur_as, interface, num_as, nomRouteur):
     res = ""
@@ -29,32 +31,50 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
         protocole = " ip ospf 123 area 0\n mpls ip"
 
 
+
+    # pour les routeurs de bordure
+    for n in range(len(obj_python["connexion"]["connections"])):
+        if nomRouteur == obj_python["connexion"]["connections"][n]["id1"] and interface == obj_python["connexion"]["connections"][n]["interface1"]:
+            address = obj_python["connexion"]["connections"][n]["address"] + \
+                str(num_routeur1)+" 255.255.255.0"
+            return "interface "+interface+" \n"+vitesse+"\n"+" ip address "+address
+
+        elif nomRouteur == obj_python["connexion"]["connections"][n]["id2"] and interface == obj_python["connexion"]["connections"][n]["interface2"]:
+            address = obj_python["connexion"]["connections"][n]["address"] + \
+               str(num_routeur1)+" 255.255.255.0"
+            return "interface "+interface+" \n"+vitesse+"\n"+" ip address "+address
+
+
     # pour le reste des routeurs
-    for i in range(len(obj_python["AS"][num_as]["connections"])):
-        if nomRouteur == obj_python["AS"][num_as]["connections"][i]["id1"] and interface == obj_python["AS"][num_as]["connections"][i]["interface1"]:
-            num_routeur2 = int(obj_python["AS"][num_as]["connections"][i]["id2"][1:])
-            address = obj_python["AS"][num_as]["prefix"] +"." +\
-                str(lan[num_routeur1][num_routeur2])
-            
-            if  interface == "FastEthernet0/0":
-                vitesse = " duplex full"
+    if(len(obj_python["AS"][num_as]["connections"])>0):
+        for i in range(len(obj_python["AS"][num_as]["connections"])):
+            if nomRouteur == obj_python["AS"][num_as]["connections"][i]["id1"] and interface == obj_python["AS"][num_as]["connections"][i]["interface1"]:
+                num_routeur2 = int(obj_python["AS"][num_as]["connections"][i]["id2"][1:])
+                address = obj_python["AS"][num_as]["prefix"] +"." +\
+                    str(lan[num_routeur1][num_routeur2])
+                
+                if  interface == "FastEthernet0/0":
+                    vitesse = " duplex full"
 
-            address = address+"."+str(num_routeur1)+" 255.255.255.0"
-            return "interface "+interface+" \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
+                address = address+"."+str(num_routeur1)+" 255.255.255.0"
+                return "interface "+interface+" \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
 
-        elif nomRouteur == obj_python["AS"][num_as]["connections"][i]["id2"] and interface == obj_python["AS"][num_as]["connections"][i]["interface2"]:
-            num_routeur2 = int(obj_python["AS"][num_as]["connections"][i]["id1"][1:])
-            address = obj_python["AS"][num_as]["prefix"] +"." + \
-                str(lan[num_routeur1][num_routeur2])
+            elif nomRouteur == obj_python["AS"][num_as]["connections"][i]["id2"] and interface == obj_python["AS"][num_as]["connections"][i]["interface2"]:
+                num_routeur2 = int(obj_python["AS"][num_as]["connections"][i]["id1"][1:])
+                address = obj_python["AS"][num_as]["prefix"] +"." + \
+                    str(lan[num_routeur1][num_routeur2])
 
-            if  interface == "FastEthernet0/0":
-                vitesse = " duplex full"
+                if  interface == "FastEthernet0/0":
+                    vitesse = " duplex full"
 
-            address = address+"."+str(num_routeur1)+" 255.255.255.0"
-            return "interface "+interface+" \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
+                address = address+"."+str(num_routeur1)+" 255.255.255.0"
+                return "interface "+interface+" \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
 
-        else:
-            res = "interface "+interface+"\n no ip address\n shutdown\n"+vitesse
+            else:
+                return "interface "+interface+"\n no ip address\n shutdown\n"+vitesse
+    else: 
+         return "interface "+interface+"\n no ip address\n shutdown\n"+vitesse
+       
 
     return res
 
@@ -66,54 +86,97 @@ def adressageLoopback(num_routeur_as, num_as):
     protocole = "" 
     if obj_python["AS"][num_as]["routage_protocol"] == "OSPF":
         protocole = " ip ospf 123 area 0"
+        return "interface Loopback0\n" + " ip address " + obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"] + " 255.255.255.255\n"  + protocole
 
-    return "interface Loopback0\n" + " ip address " + obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"] + " 255.255.255.255\n"  + protocole
+    return "interface Loopback0\n" + " ip address " + obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"] + " 255.255.255.255" 
+
 
 
 
 #ecrire bgp
-def configBGP(num_routeur, num_as, typeRouteur):
+def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
+
 
     if(typeRouteur=="bordure"):
-   
+
+        relation1 = ""
+        relation2 = ""
+        num_as_voisin=""
+        strAddressFam = "" 
+        loopbackProvider=""
+        adresse=""
         AS = str(obj_python["AS"][num_as]["numeroAS"])
        
         res =   ("router bgp "+AS+"\n"
                    + " bgp router-id "+str(num_routeur)+"."+str(num_routeur)+"."+str(num_routeur)+"."+str(num_routeur)+"\n"
                    + " bgp log-neighbor-changes\n" )
 
+      
+        for n in range(len(obj_python["connexion"]["connections"])):
+            if num_routeur == int(obj_python["connexion"]["connections"][n]["id1"][1:]):
+                num_voisin = int(obj_python["connexion"]["connections"][n]["id2"][1:])
+                relation1 = obj_python["connexion"]["connections"][n]["relation1"]
 
-        for i in range(len(obj_python["AS"][num_as]["routeurs"])):
-            adresse = obj_python["AS"][num_as]["routeurs"][i]["id"][1:]
+                for router in range(len(obj_python["connexion"]["routeurs"])):
+                    if num_voisin == int(obj_python["connexion"]["routeurs"][router]["id"][1:]):
+                        num_as_voisin = obj_python["connexion"]["routeurs"][router]["as"]
 
-# FAIRE CONDITIONS POUR NE METTRE QUE LES ROUTEURS BORDURE
-
-
-            if adresse != str(num_routeur):
-                res= res + " neighbor 10.0.0."+adresse+" remote-as "+AS+"\n"+ " neighbor 10.0.0."+adresse+" update-source Loopback0\n"
-
-        res = (res  + " !\n"
-                    + " address-family vpnv4\n" )
-     
-
-        for i in range(len(obj_python["AS"][num_as]["routeurs"])):
-            adresse = obj_python["AS"][num_as]["routeurs"][i]["id"][1:]
-
-            if adresse != str(num_routeur):
-                res = res + "  neighbor 10.0.0."+adresse+" activate\n"
-                for n in range(len(obj_python["connexion"]["connections"])):
-                    if num_routeur == int(obj_python["connexion"]["connections"][n]["id1"][1:]) or num_routeur == int(obj_python["connexion"]["connections"][n]["id2"][1:]):
-                        res = res + "  neighbor 10.0.0."+adresse+" send-community both\n"
+                if relation1 == "client":
+                    res = res + " neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id2"])[1:]+" remote-as "+str(num_as_voisin)+"\n"
+                    strAddressFam=strAddressFam + "  neighbor "+obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id2"])[1:]+ " activate\n"
 
 
-        res = res + " exit-address-family\n"
+
+
+
+            if num_routeur == int(obj_python["connexion"]["connections"][n]["id2"][1:]):
+                num_voisin = int(obj_python["connexion"]["connections"][n]["id1"][1:])
+                relation2 = obj_python["connexion"]["connections"][n]["relation2"]
+
+                for router in range(len(obj_python["connexion"]["routeurs"])):
+                    if num_voisin == int(obj_python["connexion"]["routeurs"][router]["id"][1:]):
+                        num_as_voisin = obj_python["connexion"]["routeurs"][router]["as"]
+
+                if relation2 == "client":
+                    res = res + " neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id1"])[1:]+" remote-as "+str(num_as_voisin)+"\n"
+                    strAddressFam = strAddressFam + "  neighbor "+obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id2"])[1:]+ " activate\n"
+            
+
+                    
+        if obj_python["AS"][num_as]["nomClient"]=="":
+
+            for i in range(len(obj_python["AS"][num_as]["routeurs"])):
+                adresse = obj_python["AS"][num_as]["routeurs"][i]["id"][1:] 
+
+                if ((adresse != str(num_routeur))and(obj_python["AS"][num_as]["routeurs"][i]["type"]=="bordure")):
+                    res= res + " neighbor 10.0.0."+adresse+" remote-as "+AS+"\n"+ " neighbor 10.0.0."+adresse+" update-source Loopback0\n"
+
+            res = (res  + " !\n"
+                        + " address-family vpnv4\n" )
+         
+
+            for i in range(len(obj_python["AS"][num_as]["routeurs"])):
+                adresse = obj_python["AS"][num_as]["routeurs"][i]["id"][1:]
+
+                if (adresse != str(num_routeur) and (obj_python["AS"][num_as]["routeurs"][i]["type"]=="bordure")):
+                    res = res + "  neighbor 10.0.0."+adresse+" activate\n  neighbor 10.0.0."+adresse+" send-community both\n"
+
+
+
+            res = res + " exit-address-family\n!\n"
+        
+
+        if obj_python["AS"][num_as]["nomClient"]!="":
+            res= res + "!\n address-family ipv4\n  network "+ obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"]+" mask 255.255.255.255\n" + strAddressFam+" exit-address-family\n"
+
 
         return res
 
     return ""           
 
 
-
+#faire fontion ecrire vrf
+# !!!! rajouter vrf forwarding sur interfaces
 
 
 
@@ -124,8 +187,7 @@ def ecrireConfig(num_routeur, file, num_as, num_routeur_as):
     typeRouteur = obj_python["AS"][num_as]["routeurs"][num_routeur_as]["type"]
 
     file.write("!\nversion 15.2\nservice timestamps debug datetime msec\nservice timestamps log datetime msec  \n! \nhostname "
-               + nomRouteur + "\n"
-               + ""
+               + nomRouteur + "\n" 
                + "!                                     \n"
                + "boot-start-marker                     \n"
                + "boot-end-marker                       \n"
@@ -157,7 +219,7 @@ def ecrireConfig(num_routeur, file, num_as, num_routeur_as):
                + "\n!\n"
 
                # bgp
-               + configBGP(num_routeur, num_as, typeRouteur)
+               + configBGP(num_routeur, num_as, typeRouteur, num_routeur_as)
                + ecrireProtocole(protocole, nomRouteur)
                + "!\n"
                + "ip forward-protocol nd\n"

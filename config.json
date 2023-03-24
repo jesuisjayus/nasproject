@@ -18,27 +18,95 @@
 			
 				],
 
-			"routage_protocol": "OSPF"
+				"routage_protocol": "OSPF",
+
+				"nomClient" : ""
+			
+		},
+
+		{ "numeroAS": 101,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							 {"id":"R5", "address":"10.0.0.5", "type": "bordure"}
+							],
+
+
+				"connections":[],
+
+				"routage_protocol": "",
+
+				"nomClient" : "Client_A"
+			
+		},
+
+		{ "numeroAS": 102,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							{"id":"R6", "address":"10.0.0.6", "type": "bordure"}
+							],
+
+
+				"connections":[],
+
+				"routage_protocol": "",
+
+				"nomClient" : "Client_B"
+			
+		},
+
+		{ "numeroAS": 103,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							{"id":"R7", "address":"10.0.0.7", "type": "bordure"}
+							],
+
+
+				"connections":[],
+
+				"routage_protocol": "",
+
+				"nomClient" : "Client_C"
+			
+		},
+
+		{ "numeroAS": 104,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							{"id":"R8", "address":"10.0.0.8", "type": "bordure"}
+							],
+
+
+				"connections":[],
+
+				"routage_protocol": "",
+
+				"nomClient" : "Client_D"
 			
 		}],
 
 		
 	"connexion":
 	  {
-		"routeurs":[{"id":"R6", "as": 1, "filter_state": "default"},
-		 	     	{"id":"R7", "as": 1, "filter_state": "default"},
-		 	 	   	{"id":"R8", "as": 2,  "filtre": "default" },
-					{"id":"R9", "as": 2,  "filtre": "default" },
-		 	  		{"id":"R12", "as": 2, "filter_state": "default"},
-					{"id":"R13", "as": 2, "filter_state": "default"},
-					{"id":"R15", "as": 3, "filter_state": "default"},
-					{"id":"R17", "as": 4, "filter_state": "default"}
+		"routeurs":[{"id":"R5", "as": 101, "filter_state": "default"},
+		 	     	{"id":"R6", "as": 102, "filter_state": "default"},
+		 	 	   	{"id":"R7", "as": 103,  "filtre": "default" },
+					{"id":"R8", "as": 104,  "filtre": "default" },
+		 	  		{"id":"R1", "as": 100, "filter_state": "default"},
+					{"id":"R4", "as": 100, "filter_state": "default"}
 			   ],
 
-		"connections":[{"id1":"R8", "id2": "R6" , "address": "2001:100:6:2::", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet2/0", "relation1":"peer","relation2":"peer"},
-			     	   {"id1":"R7", "id2": "R9" , "address": "2001:100:6:1::", "interface1": "GigabitEthernet3/0", "interface2": "GigabitEthernet3/0", "relation1":"peer","relation2":"peer"},
-					   {"id1":"R12", "id2": "R15" , "address": "2001:100:6:3::", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet3/0", "relation1":"peer","relation2":"provider"},
-					   {"id1":"R13", "id2": "R17" , "address": "2001:100:6:4::", "interface1": "GigabitEthernet1/0", "interface2": "GigabitEthernet3/0", "relation1":"peer","relation2":"client"}
+		"connections":[{"id1":"R5", "id2": "R1" , "address": "10.0.4.", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet2/0", "relation1":"client","relation2":"provider"},
+			     	   {"id1":"R6", "id2": "R1" , "address": "10.0.5.", "interface1": "GigabitEthernet3/0", "interface2": "GigabitEthernet3/0", "relation1":"client","relation2":"provider"},
+					   {"id1":"R7", "id2": "R4" , "address": "10.0.6.", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet2/0", "relation1":"client","relation2":"provider"},
+					   {"id1":"R8", "id2": "R4" , "address": "10.0.7.", "interface1": "GigabitEthernet3/0", "interface2": "GigabitEthernet3/0", "relation1":"client","relation2":"provider"}
 			     	 ]
 	
 
