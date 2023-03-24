@@ -110,7 +110,15 @@
 			     	 ]
 	
 
-	  }
+	  },
+
+	"relations":   [{"idPE": "R1", "client":"R5", "nomClient":"Client_A", "numImport":5, "asImport": 103},
+					{"idPE": "R1", "client":"R6", "nomClient":"Client_B", "numImport":6, "asImport": 104},
+					{"idPE": "R4", "client":"R7", "nomClient":"Client_C", "numImport":5, "asImport": 101},
+					{"idPE": "R4", "client":"R8", "nomClient":"Client_D", "numImport":6, "asImport": 102}
+				]
+
+
 	
 	
 }
