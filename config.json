@@ -1,14 +1,14 @@
 {
 	"AS":
-		[{ "numeroAS": 1,
+		[{ "numeroAS": 100,
 			
 				"prefix": "10.0",
 
 				"routeurs": [
-							{"id":"R1", "address":"10.0.0.1"},
-							{"id":"R2", "address":"10.0.0.2"},
-							{"id":"R3", "address":"10.0.0.3"},
-							{"id":"R4", "address":"10.0.0.4"}
+							{"id":"R1", "address":"10.0.0.1", "type": "bordure"},
+							{"id":"R2", "address":"10.0.0.2", "type": "coeur"},
+							{"id":"R3", "address":"10.0.0.3", "type": "coeur"},
+							{"id":"R4", "address":"10.0.0.4", "type": "bordure"}
 							],
 
 
