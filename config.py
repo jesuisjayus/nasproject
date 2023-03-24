@@ -51,10 +51,8 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
     # pour le reste des routeurs
     if(len(obj_python["AS"][num_as]["connections"])>0):
         for i in range(len(obj_python["AS"][num_as]["connections"])):
-
-            print(i)
+ 
             if nomRouteur == obj_python["AS"][num_as]["connections"][i]["id1"] and interface == obj_python["AS"][num_as]["connections"][i]["interface1"]:
-                print(nomRouteur, " interface = ", interface)
 
                 num_routeur2 = int(obj_python["AS"][num_as]["connections"][i]["id2"][1:])
                 address = obj_python["AS"][num_as]["prefix"] +"." +\
@@ -67,8 +65,7 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
                 return "interface "+interface+" \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
 
             elif nomRouteur == obj_python["AS"][num_as]["connections"][i]["id2"] and interface == obj_python["AS"][num_as]["connections"][i]["interface2"]:
-                # print(nomRouteur, " interface = ", interface)
-
+ 
                 num_routeur2 = int(obj_python["AS"][num_as]["connections"][i]["id1"][1:])
                 address = obj_python["AS"][num_as]["prefix"] +"." + \
                     str(lan[num_routeur1][num_routeur2])
@@ -80,7 +77,7 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
                 return "interface "+interface+" \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
 
         return "interface "+interface+"\n no ip address\n shutdown\n"+vitesse
-        
+
     else: 
          return "interface "+interface+"\n no ip address\n shutdown\n"+vitesse
        
@@ -284,18 +281,32 @@ def declareClient(num_routeur):
     res=""
     numClient=0
     num_as_client=0
+    premiereLigne=True
+    numClientPrecedent =0
+    numeroClient = ""
 
     for i in range(len(obj_python["relations"])): 
-        if num_routeur ==  obj_python["relations"][i]["idPE"]:
-            res =res+ "ip vrf "+ obj_python["relations"][i]["nomClient"]+"\n"
+        if num_routeur ==  obj_python["relations"][i]["idPE"]: 
             numClient = int(obj_python["relations"][i]["client"][1:])
+            if numClient != numClientPrecedent :
+                premiereLigne=True
 
             for router in range(len(obj_python["connexion"]["routeurs"])):
                 if numClient == int(obj_python["connexion"]["routeurs"][router]["id"][1:]):
                     num_as_client = obj_python["connexion"]["routeurs"][router]["as"]
 
+            for j in range(len(obj_python["AS"])):
+                if num_as_client==obj_python["AS"][i]["numeroAS"]:
+                    numeroClient = obj_python["AS"][i]["numClient"]
 
-            res = res+" rd "+str(num_as_client)+":123"+"\n route-target export "+str(num_as_client)+":"+str(obj_python["relations"][i]["numImport"])+"\n route-target import "+str(obj_python["relations"][i]["asImport"])+":"+str(obj_python["relations"][i]["numImport"])+"\n!\n"
+            if premiereLigne: 
+                res =res+ "\n!\nip vrf "+ obj_python["relations"][i]["nomClient"]+"\n"
+                premiereLigne=False
+                res = res+" rd "+str(num_as_client)+":123"+"\n route-target export "+str(num_as_client)+":"+numeroClient
+
+            
+            res=res+"\n route-target import "+str(obj_python["relations"][i]["asImport"])+":"+str(obj_python["relations"][i]["numImport"])
+            numClientPrecedent = numClient
 
     return res
 
@@ -318,6 +329,7 @@ def ecrireConfig(num_routeur, file, num_as, num_routeur_as):
                + "ip cef                                \n"
                + "!                                     \n"
                + declareClient(nomRouteur)
+               +"\n!\n"
                + "no ip domain lookup                   \n"
                + "no ipv6 cef                           \n" 
                + "!                                     \n"
