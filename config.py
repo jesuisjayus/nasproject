@@ -278,7 +278,7 @@ def forwardingClient(num_routeur, interface):
 
 
 def declareClient(num_routeur):
-    res=""
+    res="!"
     numClient=0
     num_as_client=0
     premiereLigne=True
@@ -296,8 +296,8 @@ def declareClient(num_routeur):
                     num_as_client = obj_python["connexion"]["routeurs"][router]["as"]
 
             for j in range(len(obj_python["AS"])):
-                if num_as_client==obj_python["AS"][i]["numeroAS"]:
-                    numeroClient = obj_python["AS"][i]["numClient"]
+                if num_as_client==obj_python["AS"][j]["numeroAS"]:
+                    numeroClient = obj_python["AS"][j]["numClient"]
 
             if premiereLigne: 
                 res =res+ "\n!\nip vrf "+ obj_python["relations"][i]["nomClient"]+"\n"

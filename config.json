@@ -155,7 +155,7 @@
 			   ],
 
 		"connections":[{"id1":"R5", "id2": "R1" , "address": "10.1.4.", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet2/0", "relation1":"client","relation2":"provider"},
-			     	   {"id1":"R6", "id2": "R1" , "address": "10.1.5.", "interface1": "GigabitEthernet3/0", "interface2": "GigabitEthernet3/0", "relation1":"client","relation2":"provider"},
+			     	   {"id1":"R6", "id2": "R1" , "address": "10.1.5.", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet3/0", "relation1":"client","relation2":"provider"},
 					   {"id1":"R7", "id2": "R4" , "address": "10.1.6.", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet2/0", "relation1":"client","relation2":"provider"},
 					   {"id1":"R9", "id2": "R1" , "address": "10.1.8.", "interface1": "GigabitEthernet4/0", "interface2": "GigabitEthernet4/0", "relation1":"client","relation2":"provider"},
 					   {"id1":"R10", "id2": "R4" , "address": "10.1.9.", "interface1": "GigabitEthernet4/0", "interface2": "GigabitEthernet4/0", "relation1":"client","relation2":"provider"}
