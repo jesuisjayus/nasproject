@@ -79,7 +79,10 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
         return "interface "+interface+"\n no ip address\n shutdown\n"+vitesse
 
     else: 
-         return "interface "+interface+"\n no ip address\n shutdown\n"+vitesse
+        if  interface == "FastEthernet0/0":
+            vitesse = " duplex full"
+
+        return "interface "+interface+"\n no ip address\n shutdown\n"+vitesse
        
 
     return res
