@@ -38,12 +38,12 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
         if nomRouteur == obj_python["connexion"]["connections"][n]["id1"] and interface == obj_python["connexion"]["connections"][n]["interface1"]: 
             address = obj_python["connexion"]["connections"][n]["address"] + \
                 str(num_routeur1)+" 255.255.255.0"
-            return "interface "+interface+" \n"+vitesse+"\n"+" ip address "+address
+            return " \n"+vitesse+"\n"+" ip address "+address
 
         elif nomRouteur == obj_python["connexion"]["connections"][n]["id2"] and interface == obj_python["connexion"]["connections"][n]["interface2"]: 
             address = obj_python["connexion"]["connections"][n]["address"] + \
                str(num_routeur1)+" 255.255.255.0"
-            return "interface "+interface+" \n"+vitesse+"\n"+" ip address "+address
+            return " \n"+vitesse+"\n"+" ip address "+address
 
 
 
@@ -62,7 +62,7 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
                     vitesse = " duplex full"
 
                 address = address+"."+str(num_routeur1)+" 255.255.255.0"
-                return "interface "+interface+" \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
+                return " \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
 
             elif nomRouteur == obj_python["AS"][num_as]["connections"][i]["id2"] and interface == obj_python["AS"][num_as]["connections"][i]["interface2"]:
  
@@ -74,15 +74,15 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
                     vitesse = " duplex full"
 
                 address = address+"."+str(num_routeur1)+" 255.255.255.0"
-                return "interface "+interface+" \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
+                return  " \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
 
-        return "interface "+interface+"\n no ip address\n shutdown\n"+vitesse
+        return  "\n no ip address\n shutdown\n"+vitesse
 
     else: 
         if  interface == "FastEthernet0/0":
             vitesse = " duplex full"
 
-        return "interface "+interface+"\n no ip address\n shutdown\n"+vitesse
+        return  "\n no ip address\n shutdown\n"+vitesse
        
 
     return res
@@ -340,24 +340,32 @@ def ecrireConfig(num_routeur, file, num_as, num_routeur_as):
                + "!                                     \n"
                + "ip tcp synwait-time 5                 \n"
                + "!                                     \n"
+
                + adressageLoopback(num_routeur_as, num_as)
-               + "\n!\n"
-               + adressage(num_routeur, "FastEthernet0/0", num_as, nomRouteur)
+
+               + "\n!\ninterface FastEthernet0/0" 
                + forwardingClient(num_routeur, "FastEthernet0/0")
-               + "\n!\n"
+               + adressage(num_routeur, "FastEthernet0/0", num_as, nomRouteur)
+
+               + "\n!\ninterface GigabitEthernet1/0"
+               +forwardingClient(num_routeur, "GigabitEthernet1/0")
                + adressage(num_routeur,
                            "GigabitEthernet1/0", num_as, nomRouteur)
-               +forwardingClient(num_routeur, "GigabitEthernet1/0")
-               + "\n!\n"
+            
+               + "\n!\ninterface GigabitEthernet2/0"
+               +forwardingClient(num_routeur, "GigabitEthernet2/0")
                + adressage(num_routeur,
                            "GigabitEthernet2/0", num_as, nomRouteur)
-               +forwardingClient(num_routeur, "GigabitEthernet2/0")
-               + "\n!\n"
-               + adressage(num_routeur,"GigabitEthernet3/0", num_as, nomRouteur)
+               
+               + "\n!\ninterface GigabitEthernet3/0"
                +forwardingClient(num_routeur, "GigabitEthernet3/0")
-               + "\n!\n"
-                + adressage(num_routeur,"GigabitEthernet4/0", num_as, nomRouteur)
-                +forwardingClient(num_routeur, "GigabitEthernet4/0")
+               + adressage(num_routeur,"GigabitEthernet3/0", num_as, nomRouteur)
+               
+               + "\n!\ninterface GigabitEthernet4/0"
+               +forwardingClient(num_routeur, "GigabitEthernet4/0")
+               + adressage(num_routeur,"GigabitEthernet4/0", num_as, nomRouteur)
+                
+
                + "\n!\n"
 
                # bgp
