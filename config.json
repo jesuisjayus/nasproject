@@ -23,6 +23,7 @@
 				"nomClient" : "",
 
 				"numClientVPN" : ""
+
 			
 		},
 
@@ -151,7 +152,8 @@
 		 	  		{"id":"R1", "as": 100, "filter_state": "default"},
 					{"id":"R4", "as": 100, "filter_state": "default"},
 					{"id":"R9", "as": 105, "filter_state": "default"},
-					{"id":"R10", "as": 106, "filter_state": "default"}
+					{"id":"R10", "as": 106, "filter_state": "default"},
+ 
 			   ],
 
 		"connections":[{"id1":"R5", "id2": "R1" , "address": "10.1.4.", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet2/0", "relation1":"client","relation2":"provider"},
@@ -160,7 +162,7 @@
 					   {"id1":"R9", "id2": "R1" , "address": "10.1.8.", "interface1": "GigabitEthernet4/0", "interface2": "GigabitEthernet4/0", "relation1":"client","relation2":"provider"},
 					   {"id1":"R10", "id2": "R4" , "address": "10.1.9.", "interface1": "GigabitEthernet4/0", "interface2": "GigabitEthernet4/0", "relation1":"client","relation2":"provider"},
 					   {"id1":"R8", "id2": "R4" , "address": "10.1.7.", "interface1": "GigabitEthernet3/0", "interface2": "GigabitEthernet3/0", "relation1":"client","relation2":"provider"}
-					  ]
+					   ]
 	
 
 	  },

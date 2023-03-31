@@ -25,12 +25,13 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
     address = ""
     protocole = ""
     vitesse= " negotiation auto"
+    if  interface == "FastEthernet0/0":
+        vitesse = " duplex full"
 
 
     #determiner protocole 
     if obj_python["AS"][num_as]["routage_protocol"] == "OSPF":
         protocole = " ip ospf 123 area 0\n mpls ip"
-
 
 
     # pour les routeurs de bordure
@@ -57,10 +58,7 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
                 num_routeur2 = int(obj_python["AS"][num_as]["connections"][i]["id2"][1:])
                 address = obj_python["AS"][num_as]["prefix"] +"." +\
                     str(lan[num_routeur1][num_routeur2])
-                
-                if  interface == "FastEthernet0/0":
-                    vitesse = " duplex full"
-
+               
                 address = address+"."+str(num_routeur1)+" 255.255.255.0"
                 return " \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
 
@@ -70,17 +68,13 @@ def adressage(num_routeur_as, interface, num_as, nomRouteur):
                 address = obj_python["AS"][num_as]["prefix"] +"." + \
                     str(lan[num_routeur1][num_routeur2])
 
-                if  interface == "FastEthernet0/0":
-                    vitesse = " duplex full"
-
+             
                 address = address+"."+str(num_routeur1)+" 255.255.255.0"
                 return  " \n"+" ip address "+address+"\n"+protocole+"\n"+vitesse
 
         return  "\n no ip address\n shutdown\n"+vitesse
 
     else: 
-        if  interface == "FastEthernet0/0":
-            vitesse = " duplex full"
 
         return  "\n no ip address\n shutdown\n"+vitesse
        
@@ -115,6 +109,8 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
         loopbackProvider=""
         adresse=""
         AS = str(obj_python["AS"][num_as]["numeroAS"])
+
+        nombre_clients = 0
        
         res =   ("router bgp "+AS+"\n"
                    + " bgp router-id "+str(num_routeur)+"."+str(num_routeur)+"."+str(num_routeur)+"."+str(num_routeur)+"\n"
@@ -133,9 +129,9 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
                 if relation1 == "client":
                     res = res + " neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id2"])[1:]+" remote-as "+str(num_as_voisin)+"\n"
                     strAddressFam=strAddressFam + "  neighbor "+obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id2"])[1:]+ " activate\n"
-
-
-
+                    
+                if relation1 == "provider":
+                    nombre_clients = nombre_clients + 1
 
 
             if num_routeur == int(obj_python["connexion"]["connections"][n]["id2"][1:]):
@@ -149,10 +145,12 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
                 if relation2 == "client":
                     res = res + " neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id1"])[1:]+" remote-as "+str(num_as_voisin)+"\n"
                     strAddressFam = strAddressFam + "  neighbor "+obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id2"])[1:]+ " activate\n"
-            
+                
+                if relation2 == "provider":
+                    nombre_clients = nombre_clients + 1
 
-        #Router PE 
-        if obj_python["AS"][num_as]["nomClient"]=="":
+        #Router Provider 
+        if nombre_clients>0:
 
             for i in range(len(obj_python["AS"][num_as]["routeurs"])):
                 adresse = obj_python["AS"][num_as]["routeurs"][i]["id"][1:] 
@@ -170,7 +168,7 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
                 if (adresse != str(num_routeur) and (obj_python["AS"][num_as]["routeurs"][i]["type"]=="bordure")):
                     res = res + "  neighbor 10.0.0."+adresse+" activate\n  neighbor 10.0.0."+adresse+" send-community both\n"
 
-            vrf = configVRF(num_routeur)
+            vrf = configVRF(num_routeur, nombre_clients)
             res = res + " exit-address-family\n !\n"+vrf
 
         if obj_python["AS"][num_as]["nomClient"]!="":
@@ -179,30 +177,18 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
 
         return res
 
-    return ""           
+    return "" 
 
 
-#faire fontion ecrire vrf
-# !!!! rajouter vrf forwarding sur interfaces
-
-
-def configVRF (num_routeur):
+def configVRF (num_routeur, nbclient):
     res=""
     tmp=""
     num_as_voisin=0
     num_voisin=0
 
-    client = False
-    nbclient=0
+    client = False 
     count = 0
 
-
-    for n in range(len(obj_python["connexion"]["connections"])):
-        if num_routeur == int(obj_python["connexion"]["connections"][n]["id1"][1:])and obj_python["connexion"]["connections"][n]["relation2"]=="client":
-            nbclient = nbclient+1
-
-        if num_routeur == int(obj_python["connexion"]["connections"][n]["id2"][1:])and obj_python["connexion"]["connections"][n]["relation1"]=="client":
-            nbclient = nbclient+1
 
 
     for n in range(len(obj_python["connexion"]["connections"])):
@@ -269,7 +255,6 @@ def forwardingClient(num_routeur, interface):
                 if num_voisin == int(obj_python["connexion"]["routeurs"][router]["id"][1:]):
                     num_as_voisin = obj_python["connexion"]["routeurs"][router]["as"]
 
-
                     num = 0;
                     for i in range( len(obj_python["AS"])):
                         if num_as_voisin == obj_python["AS"][i]["numeroAS"]:
@@ -284,14 +269,18 @@ def declareClient(num_routeur):
     res="!"
     numClient=0
     num_as_client=0
-    premiereLigne=True
-    numClientPrecedent =0
+    premiereLigne=True 
     numeroClient = ""
+
+    nomClient = ""
+    nomClientPrecedent = ""
 
     for i in range(len(obj_python["relations"])): 
         if num_routeur ==  obj_python["relations"][i]["idPE"]: 
             numClient = int(obj_python["relations"][i]["client"][1:])
-            if numClient != numClientPrecedent :
+            nomClient = obj_python["relations"][i]["nomClient"]
+
+            if nomClient != nomClientPrecedent :
                 premiereLigne=True
 
             for router in range(len(obj_python["connexion"]["routeurs"])):
@@ -309,7 +298,9 @@ def declareClient(num_routeur):
 
             
             res=res+"\n route-target import "+str(obj_python["relations"][i]["asImport"])+":"+str(obj_python["relations"][i]["numImport"])
-            numClientPrecedent = numClient
+           
+
+            nomClientPrecedent = nomClient
 
     return res
 
