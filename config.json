@@ -22,7 +22,7 @@
 
 				"nomClient" : "",
 
-				"numClient" : ""
+				"numClientVPN" : ""
 			
 		},
 
@@ -41,7 +41,7 @@
 
 				"nomClient" : "Client_A",
 
-				"numClient" : "5"
+				"numClientVPN" : "5"
 			
 		},
 
@@ -60,7 +60,7 @@
 
 				"nomClient" : "Client_B",
 
-				"numClient" : "6"
+				"numClientVPN" : "6"
 			
 		},
 
@@ -79,7 +79,7 @@
 
 				"nomClient" : "Client_C",
 
-				"numClient" : "7"
+				"numClientVPN" : "5"
 			
 		},
 
@@ -98,7 +98,7 @@
 
 				"nomClient" : "Client_D",
 
-				"numClient" : "8"
+				"numClientVPN" : "6"
 			
 		},
 
@@ -117,7 +117,7 @@
 
 				"nomClient" : "Client_E",
 
-				"numClient" : "9"
+				"numClientVPN" : "9"
 			
 		},
 
@@ -136,7 +136,7 @@
 
 				"nomClient" : "Client_F",
 
-				"numClient" : "10"
+				"numClientVPN" : "9"
 			
 		}
 		],

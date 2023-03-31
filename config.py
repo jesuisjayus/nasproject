@@ -171,7 +171,7 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
             res = res + " exit-address-family\n !\n"+vrf
 
         if obj_python["AS"][num_as]["nomClient"]!="":
-            res= res + "!\n address-family ipv4\n  network "+ obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"]+" mask 255.255.255.255\n" + strAddressFam+" exit-address-family\n"
+            res= res + " !\n address-family ipv4\n  network "+ obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"]+" mask 255.255.255.255\n" + strAddressFam+" exit-address-family\n"
 
 
         return res
@@ -297,7 +297,7 @@ def declareClient(num_routeur):
 
             for j in range(len(obj_python["AS"])):
                 if num_as_client==obj_python["AS"][j]["numeroAS"]:
-                    numeroClient = obj_python["AS"][j]["numClient"]
+                    numeroClient = obj_python["AS"][j]["numClientVPN"]
 
             if premiereLigne: 
                 res =res+ "\n!\nip vrf "+ obj_python["relations"][i]["nomClient"]+"\n"
