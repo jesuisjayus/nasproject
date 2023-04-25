@@ -1,10 +1,10 @@
 
 import json
 
-def ecrireFichier(cheminVersDossier, num_routeur, num_as, num_routeur_as):
+def ecrireFichier(cheminVersDossier, num_routeur, num_as, num_routeur_as, liensExt):
     chemin = cheminVersDossier+"/i"+str(num_routeur)+"_startup-config.cfg"
     file = open(chemin, "w")
-    ecrireConfig(num_routeur, file, num_as, num_routeur_as)
+    ecrireConfig(num_routeur, file, num_as, num_routeur_as, liensExt)
     file.close()
 
 
@@ -97,10 +97,10 @@ def adressageLoopback(num_routeur_as, num_as):
 
 
 #ecrire bgp
-def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
+def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as, utilRouteur, liensExt):
 
 
-    if(typeRouteur=="bordure"):
+    if(typeRouteur=="bordure" ):
 
         relation1 = ""
         relation2 = ""
@@ -129,11 +129,12 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
                 if relation1 == "client":
                     res = res + " neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id2"])[1:]+" remote-as "+str(num_as_voisin)+"\n"
                     strAddressFam=strAddressFam + "  neighbor "+obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id2"])[1:]+ " activate\n"
-                    
+
+
                 if relation1 == "provider":
                     nombre_clients = nombre_clients + 1
 
-
+        
             if num_routeur == int(obj_python["connexion"]["connections"][n]["id2"][1:]):
                 num_voisin = int(obj_python["connexion"]["connections"][n]["id1"][1:])
                 relation2 = obj_python["connexion"]["connections"][n]["relation2"]
@@ -144,18 +145,20 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
 
                 if relation2 == "client":
                     res = res + " neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id1"])[1:]+" remote-as "+str(num_as_voisin)+"\n"
-                    strAddressFam = strAddressFam + "  neighbor "+obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id2"])[1:]+ " activate\n"
-                
+                    strAddressFam = strAddressFam + "  neighbor "+obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id1"])[1:]+ " activate\n"
+
+
+
                 if relation2 == "provider":
                     nombre_clients = nombre_clients + 1
 
         #Router Provider 
-        if nombre_clients>0:
+        if nombre_clients>0 and utilRouteur== "default":
 
             for i in range(len(obj_python["AS"][num_as]["routeurs"])):
                 adresse = obj_python["AS"][num_as]["routeurs"][i]["id"][1:] 
 
-                if ((adresse != str(num_routeur))and(obj_python["AS"][num_as]["routeurs"][i]["type"]=="bordure")):
+                if ((adresse != str(num_routeur))and(obj_python["AS"][num_as]["routeurs"][i]["type"]=="bordure") and (obj_python["AS"][num_as]["routeurs"][i]["utilisation"] == "default")):
                     res= res + " neighbor 10.0.0."+adresse+" remote-as "+AS+"\n"+ " neighbor 10.0.0."+adresse+" update-source Loopback0\n"
 
             res = (res  + " !\n"
@@ -165,20 +168,78 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as):
             for i in range(len(obj_python["AS"][num_as]["routeurs"])):
                 adresse = obj_python["AS"][num_as]["routeurs"][i]["id"][1:]
 
-                if (adresse != str(num_routeur) and (obj_python["AS"][num_as]["routeurs"][i]["type"]=="bordure")):
+                if (adresse != str(num_routeur) and (obj_python["AS"][num_as]["routeurs"][i]["type"]=="bordure")  and (obj_python["AS"][num_as]["routeurs"][i]["utilisation"] == "default")):
                     res = res + "  neighbor 10.0.0."+adresse+" activate\n  neighbor 10.0.0."+adresse+" send-community both\n"
 
+            res = res + ecrireMap(num_routeur, liensExt)
             vrf = configVRF(num_routeur, nombre_clients)
             res = res + " exit-address-family\n !\n"+vrf
 
+
+        if nombre_clients > 0 and utilRouteur== "backup":   
+            
+            for j in range(len(obj_python["AS"][num_as]["routeurs"][num_routeur_as]["destination"])):
+                adresse = obj_python["AS"][num_as]["routeurs"][num_routeur_as]["destination"][j][1:] 
+                res= res + " neighbor 10.0.0."+adresse+" remote-as "+AS+"\n"+ " neighbor 10.0.0."+adresse+" update-source Loopback0\n"
+
+            res = (res  + " !\n"
+                + " address-family vpnv4\n" )
+
+            for j in range(len(obj_python["AS"][num_as]["routeurs"][num_routeur_as]["destination"])):
+                adresse = obj_python["AS"][num_as]["routeurs"][num_routeur_as]["destination"][j][1:] 
+                res = res + "  neighbor 10.0.0."+adresse+" activate\n  neighbor 10.0.0."+adresse+" send-community both\n"
+
+
+           
+            vrf = configVRF(num_routeur, nombre_clients)
+            res = res + " exit-address-family\n !\n"+vrf
+
+
+
+        # Pour le client
         if obj_python["AS"][num_as]["nomClient"]!="":
-            res= res + " !\n address-family ipv4\n  network "+ obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"]+" mask 255.255.255.255\n" + strAddressFam+" exit-address-family\n"
+ 
+            res= res + " !\n address-family ipv4\n  network "+ obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"]+" mask 255.255.255.255\n" + strAddressFam
+      
+            res = res + ecrireMap(num_routeur, liensExt)
+
+            res = res +" exit-address-family\n"
 
 
         return res
 
     return "" 
 
+
+def ecrireMap(num_routeur, liensExt):
+    # neighbor 10.0.10.6 route-map MATCH_COMM in
+    res=""
+    nomMap=""
+    dest = 0
+    typeMap = ""
+    interface = 0
+
+    print("num_routeur",num_routeur)
+
+    for i in range(len(obj_python["route-map"])):
+        print("id",obj_python["route-map"][i]["id"][1:])
+
+        if num_routeur == int(obj_python["route-map"][i]["id"][1:]):
+
+            print("aa")
+            nomMap = obj_python["route-map"][i]["nom"]
+
+            for j in range(len(obj_python["route-map"][i]["routeurs"])):
+                dest = int(obj_python["route-map"][i]["routeurs"][j]["rt"][1:])
+                interface = int(obj_python["route-map"][i]["routeurs"][j]["lien"][1:])
+                typeMap = obj_python["route-map"][i]["routeurs"][j]["type"]
+
+                numLan = liensExt[interface][dest]
+
+                res = res + "  neighbor 10.1."+ str(numLan)+"."+str(dest)+" route-map "+nomMap+" "+typeMap+"\n"
+
+    print(res)
+    return res
 
 def configVRF (num_routeur, nbclient):
     res=""
@@ -213,8 +274,12 @@ def configVRF (num_routeur, nbclient):
                     num_as_voisin = obj_python["connexion"]["routeurs"][router]["as"]
 
         if client :
-            tmp = tmp+"  neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id1"])[1:] + " remote-as "+str(num_as_voisin)+"\n"
-            tmp = tmp+"  neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ (obj_python["connexion"]["connections"][n]["id1"])[1:] +" activate\n"
+            tmp = tmp+"  neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ str(num_voisin) + " remote-as "+str(num_as_voisin)+"\n"
+            tmp = tmp+"  neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ str(num_voisin)  +" activate\n"
+
+
+            # res = res + ecrireMap(num_routeur, liensExt)
+
 
             num = 0;
             for i in range( len(obj_python["AS"])):
@@ -306,11 +371,12 @@ def declareClient(num_routeur):
 
 
 
-def ecrireConfig(num_routeur, file, num_as, num_routeur_as): 
+def ecrireConfig(num_routeur, file, num_as, num_routeur_as, liensExt): 
 
     protocole = obj_python["AS"][num_as]["routage_protocol"]
     nomRouteur = obj_python["AS"][num_as]["routeurs"][num_routeur_as]["id"]
     typeRouteur = obj_python["AS"][num_as]["routeurs"][num_routeur_as]["type"]
+    utilRouteur = obj_python["AS"][num_as]["routeurs"][num_routeur_as]["utilisation"]
 
     file.write("!\nversion 15.2\nservice timestamps debug datetime msec\nservice timestamps log datetime msec  \n! \nhostname "
                + nomRouteur + "\n" 
@@ -360,7 +426,7 @@ def ecrireConfig(num_routeur, file, num_as, num_routeur_as):
                + "\n!\n"
 
                # bgp
-               + configBGP(num_routeur, num_as, typeRouteur, num_routeur_as)
+               + configBGP(num_routeur, num_as, typeRouteur, num_routeur_as, utilRouteur, liensExt)
                + ecrireProtocole(protocole, nomRouteur)
                + "!\n"
                + "ip forward-protocol nd\n"
@@ -403,6 +469,8 @@ if __name__ == "__main__":
     jsonContent = fileObject.read()
     obj_python = json.loads(jsonContent)
 
+    lenTabConnexion = len(obj_python["connexion"]["connections"]) 
+    
     length=0
     for  i in range(len(obj_python["AS"])):
         length = length + len(obj_python["AS"][i]["routeurs"])
@@ -426,9 +494,32 @@ if __name__ == "__main__":
                         lan[j][i] = x
                         x = x+1
 
+    liensExt = [[0 for i in range(length)] for i in range(length)]
+    x=4
 
+    print(length)
+ 
+    for i in range(length):
+        for j in range(i+1,length): 
+            for k in range(lenTabConnexion):
+                if i == int(obj_python["connexion"]["connections"][k]["id1"][1:]) and j == int(obj_python["connexion"]["connections"][k]["id2"][1:]):
+                    liensExt[i][j] = x
+                    liensExt[j][i] = x
+                    x = x+1
+
+                if j == int(obj_python["connexion"]["connections"][k]["id1"][1:]) and i == int(obj_python["connexion"]["connections"][k]["id2"][1:]):
+                    liensExt[i][j] = x
+                    liensExt[j][i] = x
+                    x = x+1
+
+ 
     for a in range(len(obj_python["AS"])):
         for i in range(len(obj_python["AS"][a]["routeurs"])):
 
             num_routeur = int(obj_python["AS"][a]["routeurs"][i]["id"][1:])
-            ecrireFichier("./configs", num_routeur, a, i)
+            ecrireFichier("./configs", num_routeur, a, i, liensExt)
+
+
+
+
+            # // enlever address utiliser matrice liensExt sur python
