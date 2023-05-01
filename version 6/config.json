@@ -1,0 +1,258 @@
+{
+	"AS":
+		[{ "numeroAS": 100,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							{"id":"R1", "address":"10.0.0.1", "type": "bordure"  , "utilisation": "default", "destination" : [] },
+							{"id":"R2", "address":"10.0.0.2", "type": "coeur"    , "utilisation": "default", "destination" : [] },
+							{"id":"R3", "address":"10.0.0.3", "type": "coeur"    , "utilisation": "default", "destination" : [] },
+							{"id":"R4", "address":"10.0.0.4", "type": "bordure"  , "utilisation": "default", "destination" : [] },
+							{"id":"R11", "address":"10.0.0.11", "type": "bordure", "utilisation": "backup" , "destination" : ["R4"] }
+							],
+
+
+				"connections":[  {"id1":"R1", "id2":"R2", "interface1":"GigabitEthernet1/0",  "interface2": "GigabitEthernet1/0"  },
+								{"id1":"R2", "id2":"R3", "interface1":"GigabitEthernet2/0",   "interface2": "GigabitEthernet2/0"  },
+								{"id1":"R3", "id2":"R4", "interface1":"GigabitEthernet1/0",   "interface2": "GigabitEthernet1/0"  },							
+								{"id1":"R11", "id2":"R2", "interface1":"GigabitEthernet3/0",   "interface2": "GigabitEthernet3/0"  }							
+			
+				],
+
+				"routage_protocol": "OSPF",
+
+				"nomClient" : ""
+			
+		},
+
+		{ "numeroAS": 101,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							 {"id":"R5", "address":"10.0.0.5", "type": "bordure", "utilisation": "default", "destination" : []}
+							],
+
+
+				"connections":[],
+
+				"routage_protocol": "",
+
+				"nomClient" : "Client_A"
+			
+		},
+
+		{ "numeroAS": 102,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							{"id":"R6", "address":"10.0.0.6", "type": "bordure", "utilisation": "default", "destination" : []}
+							],
+
+
+				"connections":[],
+
+				"routage_protocol": "",
+
+				"nomClient" : "Client_B"
+			
+		},
+
+		{ "numeroAS": 103,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							{"id":"R7", "address":"10.0.0.7", "type": "bordure", "utilisation": "default", "destination" : []}
+							],
+
+
+				"connections":[],
+
+				"routage_protocol": "",
+
+				"nomClient" : "Client_C"
+			
+		},
+
+		{ "numeroAS": 104,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							{"id":"R8", "address":"10.0.0.8", "type": "bordure", "utilisation": "default", "destination" : []}
+							],
+
+
+				"connections":[],
+
+				"routage_protocol": "",
+
+				"nomClient" : "Client_D"
+			
+		},
+
+		{ "numeroAS": 105,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							{"id":"R9", "address":"10.0.0.9", "type": "bordure", "utilisation": "default", "destination" : []}
+							],
+
+
+				"connections":[],
+
+				"routage_protocol": "",
+
+				"nomClient" : "Client_E"
+			
+		},
+
+		{ "numeroAS": 106,
+			
+				"prefix": "10.0",
+
+				"routeurs": [
+							{"id":"R10", "address":"10.0.0.10", "type": "bordure", "utilisation": "default", "destination" : []}
+							],
+
+
+				"connections":[],
+
+				"routage_protocol": "",
+
+				"nomClient" : "Client_F"
+			
+		}
+		],
+
+		
+	"connexion":
+	  {
+		"routeurs":[{"id":"R5", "as": 101, "numClient": "5", "rd": "", "dest": []},
+		 	     	{"id":"R6", "as": 102, "numClient": "6", "rd": "7", "dest": ["R11"]},
+		 	 	   	{"id":"R7", "as": 103, "numClient": "5", "rd": "", "dest": []},
+					{"id":"R8", "as": 104, "numClient": "6", "rd": "", "dest": [] },
+		 	  		{"id":"R1", "as": 100, "numClient": "", "rd": "", "dest": []},
+					{"id":"R4", "as": 100, "numClient": "", "rd": "", "dest": []},
+					{"id":"R9", "as": 105, "numClient": "9", "rd": "", "dest": []},
+					{"id":"R10", "as": 106,"numClient": "9", "rd": "", "dest": []},
+					{"id":"R11", "as": 100,"numClient": "", "rd": "", "dest": []}
+
+ 
+			   ],
+
+
+
+		"connections":[{"id1":"R5", "id2": "R1" , "address": "10.1.4.", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet2/0", "relation1":"client","relation2":"provider"},
+			     	   {"id1":"R6", "id2": "R1" , "address": "10.1.5.", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet3/0", "relation1":"client","relation2":"provider"},
+					   {"id1":"R7", "id2": "R4" , "address": "10.1.6.", "interface1": "GigabitEthernet2/0", "interface2": "GigabitEthernet2/0", "relation1":"client","relation2":"provider"},
+					   {"id1":"R9", "id2": "R1" , "address": "10.1.8.", "interface1": "GigabitEthernet4/0", "interface2": "GigabitEthernet4/0", "relation1":"client","relation2":"provider"},
+					   {"id1":"R10", "id2": "R4" , "address": "10.1.9.", "interface1": "GigabitEthernet4/0", "interface2": "GigabitEthernet4/0", "relation1":"client","relation2":"provider"},
+					   {"id1":"R8", "id2": "R4" , "address": "10.1.7.", "interface1": "GigabitEthernet3/0", "interface2": "GigabitEthernet3/0", "relation1":"client","relation2":"provider"},
+					   {"id1":"R11", "id2": "R6" , "address": "10.1.10.", "interface1": "GigabitEthernet1/0", "interface2": "GigabitEthernet1/0", "relation1":"provider","relation2":"client"}			     	   
+					   ],
+	
+
+
+
+		"relations":   [{"idPE": "R1", "client":"R5", "nomClient":"Client_A", "numImport":5, "asImport": 103},
+						{"idPE": "R1", "client":"R5", "nomClient":"Client_A", "numImport":9, "asImport": 105},
+						{"idPE": "R1", "client":"R6", "nomClient":"Client_B", "numImport":6, "asImport": 104},
+						{"idPE": "R1", "client":"R6", "nomClient":"Client_B", "numImport":9, "asImport": 105},
+						{"idPE": "R11", "client":"R6", "nomClient":"Client_B", "numImport":9, "asImport": 105},
+						{"idPE": "R11", "client":"R6", "nomClient":"Client_B", "numImport":7, "asImport": 104},
+						{"idPE": "R4", "client":"R7", "nomClient":"Client_C", "numImport":5, "asImport": 101}, 
+						{"idPE": "R4", "client":"R7", "nomClient":"Client_C", "numImport":9, "asImport": 105},
+						{"idPE": "R4", "client":"R8", "nomClient":"Client_D", "numImport":6, "asImport": 102},
+						{"idPE": "R4", "client":"R8", "nomClient":"Client_D", "numImport":9, "asImport": 105},
+						{"idPE": "R1", "client":"R9", "nomClient":"Client_E", "numImport":5, "asImport": 101},
+						{"idPE": "R1", "client":"R9", "nomClient":"Client_E", "numImport":5, "asImport": 103},
+						{"idPE": "R1", "client":"R9", "nomClient":"Client_E", "numImport":6, "asImport": 102},
+						{"idPE": "R1", "client":"R9", "nomClient":"Client_E", "numImport":6, "asImport": 104}, 
+						{"idPE": "R1", "client":"R9", "nomClient":"Client_E", "numImport":9, "asImport": 106},
+						{"idPE": "R4", "client":"R10", "nomClient":"Client_F", "numImport":9, "asImport": 105} 
+					]
+	},
+
+	"filtre": [
+		{   "routeurs": ["R1", "R11"],
+			"configurations":[
+				{
+					"type": "community-list",
+					"nom": "SET_LP_110",
+					"entrées":  
+						{
+							"action": "permit",
+							"standard": "true",
+							"community": "6684782"
+						}
+				},
+				{
+					"type": "route-map",
+					"nom": "MATCH-COMM",
+					"dest": "R6",
+					"lien": "R11",
+					"prefixe": "10.1.",
+					"sortie": "in", 
+					"entrées": [
+						{
+							"sequence": "10",
+							"action": "permit",
+							"match": {
+								"community": "SET_LP_110"
+							},
+							"set": {
+								"local-preference": "110",
+								"community": ""
+							}
+						},
+						{
+							"sequence": "20",
+							"action": "permit",
+							"match": "",
+							"set": ""
+						}
+					]
+				}
+			]
+		},
+		{
+			"routeurs": ["R6"],
+			"configurations":[
+				{
+					"type": "send-community",
+					"dest": "R11",
+					"prefixe": "10.1.",
+					"entrées":
+					{
+						"community": "6684782"
+					}
+				},
+				{
+					"type": "route-map",
+					"nom": "SET_COMM",
+					"dest": "R1",
+					"lien": "R6",
+					"prefixe": "10.1.",
+					"sortie": "out", 
+					"entrées": [
+						{
+							"sequence": "10",
+							"action": "permit",
+							"match": "",
+							"set": {
+								"local-preference": "",
+								"community": "6684782"
+							}
+						}
+					]
+				}
+			]
+		}
+
+	]
+}
