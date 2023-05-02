@@ -168,8 +168,8 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as, utilRouteur, lie
                 if (adresse != str(num_routeur) and (obj_python["AS"][num_as]["routeurs"][i]["type"]=="bordure")  and (obj_python["AS"][num_as]["routeurs"][i]["utilisation"] == "default")):
                     res = res + "  neighbor 10.0.0."+adresse+" activate\n  neighbor 10.0.0."+adresse+" send-community both\n"
 
-            res = res + setMap(num_routeur, liensExt, )
-            vrf = configVRF(num_routeur, nombre_clients)
+            res = res + " "+setMap(num_routeur, liensExt, )
+            vrf = configVRF(num_routeur, nombre_clients,utilRouteur)
             res = res + " exit-address-family\n !\n"+vrf
 
 
@@ -187,13 +187,13 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as, utilRouteur, lie
                 adresse = obj_python["AS"][num_as]["routeurs"][num_routeur_as]["destination"][j][1:] 
                 res = res + "  neighbor 10.0.0."+adresse+" activate\n  neighbor 10.0.0."+adresse+" send-community both\n"
            
-            vrf = configVRF(num_routeur, nombre_clients)
+            vrf = configVRF(num_routeur, nombre_clients, utilRouteur)
             res = res + " exit-address-family\n !\n"+vrf
 
         # Pour le client
         if obj_python["AS"][num_as]["nomClient"]!="":
             res= res + " !\n address-family ipv4\n  network "+ obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"]+" mask 255.255.255.255\n" + strAddressFam     
-            res = res + setMap(num_routeur, liensExt)
+            res = res +"  "+ setMap(num_routeur, liensExt)
             res = res +" exit-address-family\n"
 
 
@@ -202,7 +202,7 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as, utilRouteur, lie
     return "" 
 
 
-def setMap(num_routeur, liensExt, nomClient):
+def setMap(num_routeur, liensExt):
     res=""
     nom = ""
     dest = 0
@@ -217,7 +217,7 @@ def setMap(num_routeur, liensExt, nomClient):
                         dest = int(obj_python["filtre"][i]["configurations"][k]["dest"][1:])
                         prefixe = obj_python["filtre"][i]["configurations"][k]["prefixe"]
                         numLan = liensExt[num_routeur][dest]
-                        res = res + "  neighbor "+prefixe+"."+str(numLan)+"."+str(dest)+ " send-community\n"
+                        res = res + "neighbor "+prefixe+"."+str(numLan)+"."+str(dest)+ " send-community\n "
                     
                     if obj_python["filtre"][i]["configurations"][k]["type"] == "route-map":
                         nom = obj_python["filtre"][i]["configurations"][k]["nom"]
@@ -227,10 +227,10 @@ def setMap(num_routeur, liensExt, nomClient):
                         prefixe = obj_python["filtre"][i]["configurations"][k]["prefixe"]
                         numLan = liensExt[dest][lien]
 
-                        res = res + "  neighbor "+ prefixe + str(numLan) +"." +str(dest)+ " route-map " +nom+" "+sortie+"\n"
+                        res = res + " neighbor "+ prefixe + str(numLan) +"." +str(dest)+ " route-map " +nom+" "+sortie+"\n"
     return res
 
-def configVRF (num_routeur, nbclient):
+def configVRF (num_routeur, nbclient, utilRouteur):
     res=""
     tmp=""
     nomClient = ""
@@ -268,9 +268,6 @@ def configVRF (num_routeur, nbclient):
             tmp = tmp+"  neighbor "+ obj_python["connexion"]["connections"][n]["address"]+ str(num_voisin)  +" activate\n"
 
 
-            # res = res + ecrireMap(num_routeur, liensExt)
-
-
             num = 0;
             for i in range( len(obj_python["AS"])):
                 if num_as_voisin == obj_python["AS"][i]["numeroAS"]:
@@ -280,9 +277,20 @@ def configVRF (num_routeur, nbclient):
             if count < nbclient:
                 nomClient = obj_python["AS"][num]["nomClient"]
 
-                res = res+" address-family ipv4 vrf "+str(obj_python["AS"][num]["nomClient"])+"\n"+ tmp + setMap(num_routeur, liensExt, nomClient) + " exit-address-family\n !\n"
+                res = res+" address-family ipv4 vrf "+str(obj_python["AS"][num]["nomClient"])+"\n"+ tmp 
+
+                # ne marche que dans ce cas particulier
+                if utilRouteur == "backup":
+                    res = res + " " + setMap(num_routeur, liensExt) 
+
+                res = res + " exit-address-family\n !\n"
             else:
-                res = res+" address-family ipv4 vrf "+str(obj_python["AS"][num]["nomClient"])+"\n"+ tmp + setMap(num_routeur, liensExt, nomClient) + " exit-address-family\n!\n"
+                res = res+" address-family ipv4 vrf "+str(obj_python["AS"][num]["nomClient"])+"\n"+ tmp 
+                # ne marche que dans ce cas particulier
+                if utilRouteur == "backup":
+                    res = res + " " + setMap(num_routeur, liensExt) 
+
+                res = res + " exit-address-family\n!\n"
 
     return res
 
