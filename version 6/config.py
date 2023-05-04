@@ -1,4 +1,3 @@
-
 import json
 
 def ecrireFichier(cheminVersDossier, num_routeur, num_as, num_routeur_as, liensExt):
@@ -561,7 +560,6 @@ if __name__ == "__main__":
     x=4
 
     print(length)
- 
     for i in range(length):
         for j in range(i+1,length): 
             for k in range(lenTabConnexion):
