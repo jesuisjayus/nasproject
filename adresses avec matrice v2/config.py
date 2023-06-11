@@ -43,13 +43,11 @@ def ecrireConfig(num_routeur, file, num_as, num_routeur_as, liensExt):
 
                + "\n!\ninterface GigabitEthernet1/0"
                +forwardingClient(num_routeur, "GigabitEthernet1/0")
-               + adressage(num_routeur,
-                           "GigabitEthernet1/0", num_as, nomRouteur)
+               + adressage(num_routeur, "GigabitEthernet1/0", num_as, nomRouteur)
             
                + "\n!\ninterface GigabitEthernet2/0"
                +forwardingClient(num_routeur, "GigabitEthernet2/0")
-               + adressage(num_routeur,
-                           "GigabitEthernet2/0", num_as, nomRouteur)
+               + adressage(num_routeur, "GigabitEthernet2/0", num_as, nomRouteur)
                
                + "\n!\ninterface GigabitEthernet3/0"
                +forwardingClient(num_routeur, "GigabitEthernet3/0")
@@ -100,7 +98,7 @@ def ecrireConfig(num_routeur, file, num_as, num_routeur_as, liensExt):
                )
 
 
-def declareClient(num_routeur):
+def declareClient(num_routeur): # voir commentaire
     res="!"
     numClient=0
     num_as_client=0
@@ -122,12 +120,11 @@ def declareClient(num_routeur):
                     num_as_client = obj_python["connexion"]["routeurs"][router]["as"]
                     numeroClient = obj_python["connexion"]["routeurs"][router]["numClient"]
                     for k in range(len(obj_python["connexion"]["routeurs"][router]["dest"])):
-                        print(k)
                         if num_routeur == obj_python["connexion"]["routeurs"][router]["dest"][k]:
                             numeroClient = obj_python["connexion"]["routeurs"][router]["rd"]                          
 
             if premiereLigne: 
-                res =res+ "\n!\nip vrf "+ obj_python["connexion"]["relations"][i]["nomClient"]+"\n"
+                res =res+ "\n!\nip vrf "+ obj_python["connexion"]["relations"][i]["nomClient"]+"\n" #est ce que on peut pas mettre direct nomClient ?
                 premiereLigne=False
                 res = res+" rd "+str(num_as_client)+":123"+"\n route-target export "+str(num_as_client)+":"+numeroClient
 
@@ -140,7 +137,7 @@ def declareClient(num_routeur):
     return res
 
 
-def adressageLoopback(num_routeur_as, num_as):
+def adressageLoopback(num_routeur_as, num_as): # est ce que on peut pas mettre ospf numAS pour adapter à chaque as ?
 
     protocole = "" 
     if obj_python["AS"][num_as]["routage_protocol"] == "OSPF":
@@ -253,6 +250,7 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as, utilRouteur, lie
         strAddressFam = "" 
         loopbackProvider=""
         adresse=""
+        set_map=""
         AS = str(obj_python["AS"][num_as]["numeroAS"])
 
         nombre_clients = 0
@@ -260,7 +258,6 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as, utilRouteur, lie
         res =   ("router bgp "+AS+"\n"
                    + " bgp router-id "+str(num_routeur)+"."+str(num_routeur)+"."+str(num_routeur)+"."+str(num_routeur)+"\n"
                    + " bgp log-neighbor-changes\n" )
-
       
         for n in range(len(obj_python["connexion"]["connections"])):
             if num_routeur == int(obj_python["connexion"]["connections"][n]["id1"][1:]):
@@ -316,7 +313,11 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as, utilRouteur, lie
                 if (adresse != str(num_routeur) and (obj_python["AS"][num_as]["routeurs"][i]["type"]=="bordure")  and (obj_python["AS"][num_as]["routeurs"][i]["utilisation"] == "default")):
                     res = res + "  neighbor 10.0.0."+adresse+" activate\n  neighbor 10.0.0."+adresse+" send-community both\n"
 
-            res = res + " "+setMap(num_routeur, liensExt, )
+            set_map = setMap(num_routeur, liensExt)
+            
+            if set_map != "":
+                res = res + " "+set_map
+
             vrf = configVRF(num_routeur, nombre_clients,utilRouteur)
             res = res + " exit-address-family\n !\n"+vrf
 
@@ -340,10 +341,12 @@ def configBGP(num_routeur, num_as, typeRouteur, num_routeur_as, utilRouteur, lie
 
         # Pour le client
         if obj_python["AS"][num_as]["nomClient"]!="":
-            res= res + " !\n address-family ipv4\n  network "+ obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"]+" mask 255.255.255.255\n" + strAddressFam     
-            res = res +"  "+ setMap(num_routeur, liensExt)
-            res = res +" exit-address-family\n"
-
+            set_map= setMap(num_routeur, liensExt)
+            res= res + " !\n address-family ipv4\n  network "+ obj_python["AS"][num_as]["routeurs"][num_routeur_as]["address"]+" mask 255.255.255.255\n" + strAddressFam
+            if set_map != "":          
+                res = res+"  "+ set_map
+            
+            res = res +" exit-address-family\n" 
 
         return res
 
@@ -436,6 +439,7 @@ def setMap(num_routeur, liensExt):
                         dest = int(obj_python["filtre"][i]["configurations"][k]["dest"][1:])
                         prefixe = obj_python["filtre"][i]["configurations"][k]["prefixe"]
                         numLan = liensExt[num_routeur][dest]
+                        
                         res = res + "neighbor "+prefixe+str(numLan)+"."+str(dest)+ " send-community\n "
                     
                     if obj_python["filtre"][i]["configurations"][k]["type"] == "route-map":
@@ -490,13 +494,11 @@ def configVRF (num_routeur, nbclient, utilRouteur):
             tmp = tmp+"  neighbor "+ address  + " remote-as "+str(num_as_voisin)+"\n"
             tmp = tmp+"  neighbor "+ address  + " activate\n"
 
-
             num = 0;
             for i in range( len(obj_python["AS"])):
                 if num_as_voisin == obj_python["AS"][i]["numeroAS"]:
                     num = i
-
-           
+      
             if count < nbclient:
                 nomClient = obj_python["AS"][num]["nomClient"]
 
@@ -551,8 +553,6 @@ if __name__ == "__main__":
 
     liensExt = [[0 for i in range(length)] for i in range(length)]
     x=4
-
-    print(length)
  
     for i in range(length):
         for j in range(i+1,length): 
@@ -566,15 +566,10 @@ if __name__ == "__main__":
                     liensExt[i][j] = x
                     liensExt[j][i] = x
                     x = x+1
-
-
-    print(lan, "\na\n",liensExt)
-
  
     for a in range(len(obj_python["AS"])):
         for i in range(len(obj_python["AS"][a]["routeurs"])):
-
             num_routeur = int(obj_python["AS"][a]["routeurs"][i]["id"][1:])
-            ecrireFichier("./configs", num_routeur, a, i, liensExt)
+            ecrireFichier("./configs générées", num_routeur, a, i, liensExt)
             
             
