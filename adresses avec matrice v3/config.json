@@ -5,11 +5,11 @@
 				"prefix": "10.0",
 
 				"routeurs": [
-							{"id":"R1", "address":"10.0.0.1", "type": "bordure"  , "utilisation": "default", "destination" : [] },
-							{"id":"R2", "address":"10.0.0.2", "type": "coeur"    , "utilisation": "default", "destination" : [] },
-							{"id":"R3", "address":"10.0.0.3", "type": "coeur"    , "utilisation": "default", "destination" : [] },
-							{"id":"R4", "address":"10.0.0.4", "type": "bordure"  , "utilisation": "default", "destination" : [] },
-							{"id":"R11", "address":"10.0.0.11", "type": "bordure", "utilisation": "backup" , "destination" : ["R4"] }
+							{"id":"R1", "address":"10.0.0.1", "type": "bordure"},
+							{"id":"R2", "address":"10.0.0.2", "type": "coeur"},
+							{"id":"R3", "address":"10.0.0.3", "type": "coeur"},
+							{"id":"R4", "address":"10.0.0.4", "type": "bordure"},
+							{"id":"R11", "address":"10.0.0.11", "type": "bordure"}
 							],
 
 
@@ -31,7 +31,7 @@
 				"prefix": "10.0",
 
 				"routeurs": [
-							 {"id":"R5", "address":"10.0.0.5", "type": "bordure", "utilisation": "default", "destination" : []}
+							 {"id":"R5", "address":"10.0.0.5", "type": "bordure"}
 							],
 
 
@@ -48,7 +48,7 @@
 				"prefix": "10.0",
 
 				"routeurs": [
-							{"id":"R6", "address":"10.0.0.6", "type": "bordure", "utilisation": "default", "destination" : []}
+							{"id":"R6", "address":"10.0.0.6", "type": "bordure"}
 							],
 
 
@@ -65,7 +65,7 @@
 				"prefix": "10.0",
 
 				"routeurs": [
-							{"id":"R7", "address":"10.0.0.7", "type": "bordure", "utilisation": "default", "destination" : []}
+							{"id":"R7", "address":"10.0.0.7", "type": "bordure"}
 							],
 
 
@@ -82,7 +82,7 @@
 				"prefix": "10.0",
 
 				"routeurs": [
-							{"id":"R8", "address":"10.0.0.8", "type": "bordure", "utilisation": "default", "destination" : []}
+							{"id":"R8", "address":"10.0.0.8", "type": "bordure"}
 							],
 
 
@@ -99,7 +99,7 @@
 				"prefix": "10.0",
 
 				"routeurs": [
-							{"id":"R9", "address":"10.0.0.9", "type": "bordure", "utilisation": "default", "destination" : []}
+							{"id":"R9", "address":"10.0.0.9", "type": "bordure"}
 							],
 
 
@@ -116,7 +116,7 @@
 				"prefix": "10.0",
 
 				"routeurs": [
-							{"id":"R10", "address":"10.0.0.10", "type": "bordure", "utilisation": "default", "destination" : []}
+							{"id":"R10", "address":"10.0.0.10", "type": "bordure"}
 							],
 
 
@@ -138,7 +138,7 @@
 		"routeurs":[{"id":"R5", "as": 101, "numClient": "5", "rd": "", "dest": []},
 		 	     	{"id":"R6", "as": 102, "numClient": "6", "rd": "7", "dest": ["R11"]},
 		 	 	   	{"id":"R7", "as": 103, "numClient": "5", "rd": "", "dest": []},
-					{"id":"R8", "as": 104, "numClient": "6", "rd": "", "dest": [] },
+					{"id":"R8", "as": 104, "numClient": "6", "rd": "7", "dest": ["R4b"] },
 		 	  		{"id":"R1", "as": 100, "numClient": "", "rd": "", "dest": []},
 					{"id":"R4", "as": 100, "numClient": "", "rd": "", "dest": []},
 					{"id":"R9", "as": 105, "numClient": "9", "rd": "", "dest": []},
@@ -172,6 +172,7 @@
 						{"idPE": "R4", "client":"R7", "nomClient":"Client_C", "numImport":9, "asImport": 105},
 						{"idPE": "R4", "client":"R8", "nomClient":"Client_D", "numImport":6, "asImport": 102},
 						{"idPE": "R4", "client":"R8", "nomClient":"Client_D", "numImport":9, "asImport": 105},
+						{"idPE": "R4", "client":"R8", "nomClient":"Client_D", "numImport":7, "asImport": 102},
 						{"idPE": "R1", "client":"R9", "nomClient":"Client_E", "numImport":5, "asImport": 101},
 						{"idPE": "R1", "client":"R9", "nomClient":"Client_E", "numImport":5, "asImport": 103},
 						{"idPE": "R1", "client":"R9", "nomClient":"Client_E", "numImport":6, "asImport": 102},
@@ -191,14 +192,15 @@
 						{
 							"action": "permit",
 							"standard": "true",
-							"community": "6684782"
+							"community": "102:6684"
 						}
 				},
 				{
 					"type": "route-map",
-					"nom": "MATCH-COMM",
+					"nom": "MATCH_COMM",
 					"dest": "R6",
-					"lien": "R11",
+					"network": "",
+					"vrf": "Client_B",
 					"prefixe": "10.1.",
 					"sortie": "in", 
 					"entrées": [
@@ -232,14 +234,15 @@
 					"prefixe": "10.1.",
 					"entrées":
 					{
-						"community": "6684782"
+						"community": "102:6684"
 					}
 				},
 				{
 					"type": "route-map",
 					"nom": "SET_COMM",
-					"dest": "R1",
-					"lien": "R6",
+					"dest": "R11",
+					"network": "10.0.0.6",
+					"vrf": "",
 					"prefixe": "10.1.",
 					"sortie": "out", 
 					"entrées": [
@@ -249,7 +252,7 @@
 							"match": "",
 							"set": {
 								"local-preference": "",
-								"community": "6684782"
+								"community": "102:6684"
 							}
 						}
 					]
